@@ -1,0 +1,3 @@
+yara-python==3.11.0
+androguard==3.3.5
+filetype==1.0.5
