@@ -2,9 +2,11 @@ import os
 import sys
 import argparse
 import yaml
+from subprocess import call
 from .yaraa import lookup
 
 CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".yaraa")
+
 
 def read_config() -> dict:
     """
@@ -15,7 +17,7 @@ def read_config() -> dict:
             config = yaml.safe_load(f)
         return config
     else:
-        return {'files':[]}
+        return {'files': []}
 
 
 def main():
@@ -26,10 +28,10 @@ def main():
     args = parser.parse_args()
 
     if args.rules:
-        if os.path.isfile(args.rules):
+        if not os.path.isfile(args.rules):
             print("No such rule file")
             sys.exit(1)
-        res = lookup([args.RULES], args.FILE)
+        res = lookup([args.rules], args.FILE)
     else:
         config = read_config()
         if len(config['files']):
@@ -41,10 +43,9 @@ def main():
     for r in res:
         if r[1]:
             print("{} - MATCHES {}".format(
-                    r[0],
-                    ','.join(set(r[2]))
-                )
-            )
+                r[0],
+                ','.join(set(r[2]))
+            ))
         else:
             if args.verbose:
                 print("{} - NO DETECTION".format(r[0]))
@@ -100,7 +101,17 @@ def config():
             else:
                 print("This file is not in the list, sorry")
         elif args.command == "pull":
-            print("Not implemented yet, sorry")
+            config = read_config()
+            if len(config['files']) == 0:
+                print("No yara file in the list, please add one with yaraa-config")
+                sys.exit(0)
+            for f in config['files']:
+                path = os.path.dirname(f)
+                if os.path.isdir(os.path.join(path, '.git')):
+                    print("Updating {}".format(path))
+                    call(["git", "-C", path, "pull"])
+                else:
+                    print("{} - Not a git folder".format(path))
         else:
             parser.print_help()
     else:

@@ -1,7 +1,10 @@
-import argparse
 import os
 import filetype
 import yara
+import io
+import gzip
+import tarfile
+import bz2
 from zipfile import ZipFile
 
 
@@ -17,30 +20,43 @@ def analyze_final_file(name: str, data: bytes, rules: list) -> list:
         return [name, False, []]
 
 
-def analyze_file(path: str, rules: list) -> list:
-    ttype = filetype.guess(path)
+def analyze_file(name: str, data: bytes, rules: list) -> list:
+    ttype = filetype.guess(data)
+    results = []
     if ttype:
         if ttype.mime == "application/zip":
             # APKs are ZIP files too, check if APK
-            input_zip=ZipFile(path)
+            fio = io.BytesIO(data)
+            input_zip = ZipFile(fio)
             all_files = input_zip.namelist()
             if 'classes.dex' in all_files and 'AndroidManifest.xml' in all_files:
                 # TODO : sometimes several dex files
                 data = input_zip.read('classes.dex')
-                return analyze_final_file("{}:DEX".format(path), data, rules)
+                results.append(analyze_final_file("{}:DEX".format(name), data, rules))
             else:
                 # ZIP File, analyze all files one by one
                 for f in input_zip.namelist():
                     data = input_zip.read(f)
-                    return analyze_final_file("{}:{}".format(path, f), data, rules)
+                    results += analyze_file("{}:{}".format(name, f), data, rules)
+        elif ttype.mime == "application/gzip":
+            dd = gzip.decompress(data)
+            results += analyze_file(name, dd, rules)
+        elif ttype.mime == "application/x-tar":
+            fio = io.BytesIO(data)
+            tar = tarfile.open(fileobj=fio)
+            for t in tar:
+                # TODO : handle folders
+                if t.isreg():
+                    f = tar.extractfile(t)
+                    data = f.read()
+                    results += analyze_file("{}:{}".format(name, t.name), data, rules)
+        elif ttype.mime == "application/x-bzip2":
+            dd = bz2.decompress(data)
+            results += analyze_file(name, dd, rules)
         else:
-            with open(path, 'rb') as f:
-                data = f.read()
-                return analyze_final_file(path, data, rules)
+            results.append(analyze_final_file(name, data, rules))
     else:
-        with open(path, 'rb') as f:
-            data = f.read()
-            return analyze_final_file(path, data, rules)
+        results.append(analyze_final_file(name, data, rules))
     return results
 
 
@@ -51,14 +67,15 @@ def lookup(rules: list, path: str) -> list:
         Detection is a boolean value about detection
     """
     crules = [yara.compile(r) for r in rules]
-    # Test rules
-
+    # TODO Test rules
     results = []
 
     if os.path.isdir(path):
         for r, d, f in os.walk(path):
             for file in f:
-                results.append(analyze_file(os.path.join(r, file), crules))
+                with open(os.path.join(r, file), 'rb') as f:
+                    results += analyze_file(os.path.join(r, file), f.read(), crules)
     elif os.path.isfile(path):
-        results.append(analyze_file(path, crules))
+        with open(path, 'rb') as f:
+            results += analyze_file(path, f.read(), crules)
     return results
