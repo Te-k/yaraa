@@ -6,6 +6,7 @@ import gzip
 import tarfile
 import bz2
 from zipfile import ZipFile
+from oletools import olevba
 
 
 def analyze_final_file(name: str, data: bytes, rules: list) -> list:
@@ -56,6 +57,15 @@ def analyze_file(name: str, data: bytes, rules: list) -> list:
         else:
             results.append(analyze_final_file(name, data, rules))
     else:
+        # Doc files are not detected by filetype :(
+        try:
+            vbaparser = olevba.VBA_Parser(name, data=data)
+            if vbaparser.detect_vba_macros():
+                macros = '\n'.join([a[3] for a in vbaparser.extract_macros()])
+                results.append(analyze_final_file('{}:macro'.format(name), macros, rules))
+        except olevba.FileOpenError:
+            # Not a doc file with macro
+            pass
         results.append(analyze_final_file(name, data, rules))
     return results
 

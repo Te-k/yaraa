@@ -13,7 +13,7 @@ setup(
     author='Tek',
     author_email='tek@randhome.io',
     keywords='archive',
-    install_requires=['yara-python==3.11.0'],
+    install_requires=['yara-python==3.11.0', 'androguard==3.3.5', 'filetype==1.0.5', 'oletools==0.54.2'],
     license='MIT',
     python_requires='>=3.5',
     packages=['yaraa'],
