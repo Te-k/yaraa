@@ -6,7 +6,7 @@
 * Quickly update yara rules in git repositores with `yaraa-config pull`
 * Check files in archives - IN PROGRESS
     * zip : Done
-    * zip with infected password : TODO
+    * zip with password "infected" or "malware": Done
     * tar.gz : Done
     * bzip2 : Done
     * Macros in files : Done

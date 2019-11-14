@@ -36,9 +36,25 @@ def analyze_file(name: str, data: bytes, rules: list) -> list:
                 results.append(analyze_final_file("{}:DEX".format(name), data, rules))
             else:
                 # ZIP File, analyze all files one by one
-                for f in input_zip.namelist():
-                    data = input_zip.read(f)
-                    results += analyze_file("{}:{}".format(name, f), data, rules)
+                try:
+                    for f in input_zip.namelist():
+                        data = input_zip.read(f)
+                        results += analyze_file("{}:{}".format(name, f), data, rules)
+                except RuntimeError:
+                    # Password protected
+                    # Test with "infected"
+                    try:
+                        for f in input_zip.namelist():
+                            data = input_zip.read(f, pwd=b"infected")
+                            results += analyze_file("{}:{}".format(name, f), data, rules)
+                    except RuntimeError:
+                        # Try with "malware"
+                        try:
+                            for f in input_zip.namelist():
+                                data = input_zip.read(f, pwd=b"malware")
+                                results += analyze_file("{}:{}".format(name, f), data, rules)
+                        except RuntimeError:
+                            pass
         elif ttype.mime == "application/gzip":
             dd = gzip.decompress(data)
             results += analyze_file(name, dd, rules)
