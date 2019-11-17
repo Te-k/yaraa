@@ -4,13 +4,13 @@
 
 * Keep a default list of Yara rules with `yaraa-config add`
 * Quickly update yara rules in git repositores with `yaraa-config pull`
-* Check files in archives - IN PROGRESS
-    * zip : Done
-    * zip with password "infected" or "malware": Done
-    * tar.gz : Done
-    * bzip2 : Done
-    * Macros in files : Done
-* Check dex in android - Done
+* Check files in archives :
+    * zip
+    * zip with password "infected" or "malware"
+    * tar.gz
+    * bzip2
+    * Macros in files
+* Check dex files in APKs
 * Generate androguard json for APKs and check with androguard - TODO
     * https://github.com/Koodous/androguard-yara
 
