@@ -24,23 +24,43 @@ def main():
     parser = argparse.ArgumentParser(description='Advanced Yara checking')
     parser.add_argument('FILE', help='File to be checked')
     parser.add_argument('--rules', '-r', help='Yara rules')
+    parser.add_argument('--recursive', '-R', action='store_true', help='Recursive search (for folders only)')
     parser.add_argument('--verbose', '-v', action='count', default=0, help="Verbose")
     args = parser.parse_args()
 
+    # Identify rules
     if args.rules:
         if not os.path.isfile(args.rules):
             print("No such rule file")
             sys.exit(1)
-        res = lookup([args.rules], args.FILE)
+        rules = [args.rules]
     else:
         config = read_config()
-        if len(config['files']):
-            res = lookup(config['files'], args.FILE)
+        if len(config['files']) > 0:
+            rules = config['files']
         else:
             print("No yara rule configured, please add rules with yaraa-config or with -r")
             sys.exit(1)
 
-    for r in res:
+    # Lookup files
+    results = []
+    if os.path.isdir(args.FILE):
+        if args.recursive:
+            for r, d, f in os.walk(args.FILE):
+                for file in f:
+                    if args.verbose:
+                        print("Analyzing {}".format(os.path.join(r, file)))
+                    results += lookup(rules, os.path.join(r, file))
+        else:
+            for f in os.listdir(args.FILE):
+                if os.path.isfile(os.path.join(args.FILE, f)):
+                    if args.verbose:
+                        print("Analyzing {}".format(os.path.join(args.FILE, f)))
+                    results += lookup(rules, os.path.join(args.FILE, f))
+    elif os.path.isfile(args.FILE):
+        results += lookup(rules, args.FILE)
+
+    for r in results:
         if r[1]:
             print("{} - MATCHES {}".format(
                 r[0],

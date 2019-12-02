@@ -97,14 +97,8 @@ def lookup(rules: list, path: str) -> list:
     """
     crules = [yara.compile(r) for r in rules]
     # TODO Test rules
-    results = []
 
-    if os.path.isdir(path):
-        for r, d, f in os.walk(path):
-            for file in f:
-                with open(os.path.join(r, file), 'rb') as f:
-                    results += analyze_file(os.path.join(r, file), f.read(), crules)
-    elif os.path.isfile(path):
+    if os.path.isfile(path):
         with open(path, 'rb') as f:
-            results += analyze_file(path, f.read(), crules)
-    return results
+            return analyze_file(path, f.read(), crules)
+    return []
