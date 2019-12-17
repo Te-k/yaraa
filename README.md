@@ -11,8 +11,6 @@
     * bzip2
     * Macros in files
 * Check dex files in APKs
-* Generate androguard json for APKs and check with androguard - TODO
-    * https://github.com/Koodous/androguard-yara
 
 ## Installation
 
