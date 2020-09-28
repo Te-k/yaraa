@@ -1,4 +1,5 @@
 yara-python==3.11.0
 androguard==3.3.5
-oletools==0.54.2
+oletools
 python-magic==0.4.15
+pyyaml
