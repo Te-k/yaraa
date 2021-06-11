@@ -101,13 +101,14 @@ def config():
             # Adding file to the list
             if not os.path.isfile(args.FILE):
                 print("Invalid file")
-                # TODO : check that the rule is valid
                 sys.exit(1)
+            path = os.path.abspath(args.FILE)
             config = read_config()
-            if args.FILE in config['files']:
+            if path in config['files']:
                 print("File already in the list")
                 sys.exit(1)
-            config['files'].append(args.FILE)
+            # TODO : check that the rule is valid
+            config['files'].append(path)
             with open(CONFIG_PATH, "w") as f:
                 f.write(yaml.dump(config))
             print("File added")

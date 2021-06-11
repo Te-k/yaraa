@@ -30,8 +30,11 @@ def analyze_file(name: str, data: bytes, rules: list) -> list:
             fio = io.BytesIO(data)
             input_zip = ZipFile(fio)
             # FIXME : get all the dex files using androguard
-            data = input_zip.read('classes.dex')
-            results.append(analyze_final_file("{}:DEX".format(name), data, rules))
+            try:
+                data = input_zip.read('classes.dex')
+                results.append(analyze_final_file("{}:DEX".format(name), data, rules))
+            except KeyError:
+                pass
         elif mime_type == "application/zip":
             fio = io.BytesIO(data)
             input_zip = ZipFile(fio)

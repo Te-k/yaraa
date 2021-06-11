@@ -14,10 +14,21 @@
 
 ## Installation
 
+For some technical reasons, you need to install [yara-python](https://github.com/VirusTotal/yara-python) manually form sources before install yaraa:
+
 ```
-git clone https://github.com/Te-k/yaraa.git
-cd yaraa
-pip install .
+$ git clone --recursive https://github.com/VirusTotal/yara-python
+$ cd yara-python
+$ python setup.py build
+$ sudo python setup.py install
+```
+
+Then you can install yaraa:
+
+```
+$ git clone https://github.com/Te-k/yaraa.git
+$ cd yaraa
+$ pip install .
 ```
 
 ## Usage
