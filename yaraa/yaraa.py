@@ -1,11 +1,12 @@
-import os
-import yara
-import io
-import gzip
-import tarfile
 import bz2
-import magic
+import gzip
+import io
+import os
+import tarfile
 from zipfile import ZipFile
+
+import magic
+import yara
 from oletools import olevba
 
 
@@ -38,7 +39,6 @@ def analyze_file(name: str, data: bytes, rules: list) -> list:
         elif mime_type == "application/zip":
             fio = io.BytesIO(data)
             input_zip = ZipFile(fio)
-            all_files = input_zip.namelist()
             # ZIP File, analyze all files one by one
             try:
                 for f in input_zip.namelist():

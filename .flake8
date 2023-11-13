@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E712
+exclude =
+    .git,
+    *Tests.py,
+    __pycache__,
+    venv,
+    old,
+    build,
+    dist

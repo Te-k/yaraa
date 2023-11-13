@@ -13,12 +13,12 @@ setup(
     author='Tek',
     author_email='tek@randhome.io',
     keywords='archive',
-    install_requires=['yara-python==4.1.0', 'androguard==3.3.5', 'python-magic==0.4.18', 'oletools', 'pyyaml'],
+    install_requires=['yara-python==4.3.1', 'androguard==3.3.5', 'python-magic==0.4.18', 'oletools', 'pyyaml'],
     license='MIT',
     python_requires='>=3.5',
     packages=['yaraa'],
-    entry_points= {
-        'console_scripts': [ 'yaraa=yaraa.cli:main', 'yaraa-config=yaraa.cli:config' ]
+    entry_points={
+        'console_scripts': ['yaraa=yaraa.cli:main', 'yaraa-config=yaraa.cli:config']
     },
     classifiers=[
         "Programming Language :: Python :: 3",

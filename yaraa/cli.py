@@ -1,8 +1,10 @@
+import argparse
 import os
 import sys
-import argparse
-import yaml
 from subprocess import call
+
+import yaml
+
 from .yaraa import lookup
 
 CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".yaraa")

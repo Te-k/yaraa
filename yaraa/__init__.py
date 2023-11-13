@@ -1,1 +1,1 @@
-from .yaraa import lookup
+from .yaraa import lookup  # noqa: F401
